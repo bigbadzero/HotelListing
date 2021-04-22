@@ -13,11 +13,8 @@ namespace HotelListing.Data
 
         }
 
-        
-
         public DbSet<Country> Countries { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
-
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

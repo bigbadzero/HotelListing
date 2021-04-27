@@ -49,7 +49,6 @@ namespace HotelListing.Controllers
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        
         public async Task<IActionResult> GetHotel(int id)
         {
             try

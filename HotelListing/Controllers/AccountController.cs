@@ -82,7 +82,7 @@ namespace HotelListing.Controllers
 
                 if (!await _authManager.ValidateUser(userDTO))
                 {
-                    return Unauthorized(userDTO);
+                    return Unauthorized();
                 }
 
                 return Accepted(new { Token = await _authManager.CreateToken() });

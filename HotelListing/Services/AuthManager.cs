@@ -39,14 +39,14 @@ namespace HotelListing.Services
             var jwtSettings = _configuration.GetSection("Jwt");
             var expiration = DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings.GetSection("lifetime").Value));
 
-            var options = new JwtSecurityToken(
-                issuer: jwtSettings.GetSection("validIssuer").Value,
+            var token = new JwtSecurityToken(
+                issuer: jwtSettings.GetSection("Issuer").Value,
                 claims: claims,
                 expires: expiration,
                 signingCredentials: signingCredentials
                 );
 
-            return options;
+            return token;
         }
 
         private async Task<List<Claim>> GetClaims()
@@ -77,7 +77,9 @@ namespace HotelListing.Services
         public async Task<bool> ValidateUser(LoginUserDTO userDTO)
         {
             _user = await _userManager.FindByNameAsync(userDTO.Email);
-            return (_user != null && await _userManager.CheckPasswordAsync(_user, userDTO.Password));
+            var validPassword = await _userManager.CheckPasswordAsync(_user, userDTO.Password);
+
+            return (_user != null && validPassword);
         }
     }
 }

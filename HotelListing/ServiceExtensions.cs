@@ -26,7 +26,7 @@ namespace HotelListing
         {
             var jwtSettings = configuration.GetSection("Jwt");
             var key = Environment.GetEnvironmentVariable("KEY");
-
+              
             services.AddAuthentication(o =>
             {
                 o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

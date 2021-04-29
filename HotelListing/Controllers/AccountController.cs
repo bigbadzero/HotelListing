@@ -40,30 +40,21 @@ namespace HotelListing.Controllers
                 //inform sender what went wrong
                 return BadRequest(ModelState);
             }
+            var user = _mapper.Map<ApiUser>(userDTO);
+            user.UserName = userDTO.Email;
+            var results = await _userManager.CreateAsync(user, userDTO.Password);
 
-            try
+            if (!results.Succeeded)
             {
-                var user = _mapper.Map<ApiUser>(userDTO);
-                user.UserName = userDTO.Email;
-                var results = await _userManager.CreateAsync(user, userDTO.Password);
-
-                if (!results.Succeeded)
+                foreach(var error in results.Errors)
                 {
-                    foreach(var error in results.Errors)
-                    {
-                        ModelState.AddModelError(error.Code, error.Description);
-                    }
-                    return BadRequest(ModelState);
+                    ModelState.AddModelError(error.Code, error.Description);
                 }
+                return BadRequest(ModelState);
+            }
 
-                await _userManager.AddToRolesAsync(user, userDTO.Roles);
-                return Accepted();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, $"Something Went Wrong in the {nameof(Register)}");
-                return Problem($"Something Went Wrong in the {nameof(Register)}", statusCode: 500);
-            }
+            await _userManager.AddToRolesAsync(user, userDTO.Roles);
+            return Accepted();
         }
 
         [HttpPost]
@@ -76,24 +67,12 @@ namespace HotelListing.Controllers
                 //inform sender what went wrong
                 return BadRequest(ModelState);
             }
-
-            try
+            if (!await _authManager.ValidateUser(userDTO))
             {
-
-                if (!await _authManager.ValidateUser(userDTO))
-                {
-                    return Unauthorized();
-                }
-
-                return Accepted(new { Token = await _authManager.CreateToken() });
+                return Unauthorized();
             }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, $"Something Went Wrong in the {nameof(Login)}");
-                return Problem($"Something Went Wrong in the {nameof(Login)}", statusCode: 500);
-            }
+
+            return Accepted(new { Token = await _authManager.CreateToken() });
         }
-
-        
     }
 }
